@@ -23,6 +23,7 @@ TEMP_DIR = ".scanpkgtmp"
 class scanpkg:
 	class control:
 		STRING = ""
+
 		def __init__(self, control, deb, origdir):
 			MD5sum = subprocess.Popen([os.path.join(os.path.dirname(os.path.realpath(__file__)), "bin/md5sum.exe"), deb], stdout=subprocess.PIPE).communicate()[0]
 			MD5sum = MD5sum.split(" ", 1)[0]
