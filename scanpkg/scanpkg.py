@@ -2,15 +2,18 @@
 # -*- coding: utf-8 -*-
 # @Author: Mustafa
 # @Date:   2015-07-09 23:52:55
-# @Last Modified by:   Mustafa
-# @Last Modified time: 2015-07-30 03:20:33
+# @Last Modified by:   nanit190
+# @Last Modified time: 2019-03-25
+
 
 # Exceptions
 class scanpkgControlException(Exception):
 	pass
 
+
 class scanpkgDirNotFound(Exception):
 	pass
+
 
 import click, os, shutil, patoolib, sys, subprocess
 #sys.tracebacklimit = 0
@@ -21,10 +24,10 @@ class scanpkg:
 	class control:
 		STRING = ""
 		def __init__(self, control, deb, origdir):
-			MD5sum = subprocess.Popen(["md5sum", deb], stdout=subprocess.PIPE).communicate()[0]
+			MD5sum = subprocess.Popen([os.path.join(os.path.dirname(os.path.realpath(__file__)), "bin/md5sum.exe"), deb], stdout=subprocess.PIPE).communicate()[0]
 			MD5sum = MD5sum.split(" ", 1)[0]
 
-			if (MD5sum[:1] == "\\"):
+			if MD5sum[:1] == "\\":
 				MD5sum = MD5sum[1:]
 
 			MD5sum = "MD5sum: {0}\n".format(MD5sum)
@@ -32,7 +35,7 @@ class scanpkg:
 			SHA1 = subprocess.Popen([os.path.join(os.path.dirname(os.path.realpath(__file__)), "bin/sha1sum.exe"), deb], stdout=subprocess.PIPE).communicate()[0]
 			SHA1 = SHA1.split(" ", 1)[0]
 
-			if (SHA1[:1] == "\\"):
+			if SHA1[:1] == "\\":
 				SHA1 = SHA1[1:]
 
 			SHA1 = "SHA1: {0}\n".format(SHA1)
@@ -40,7 +43,7 @@ class scanpkg:
 			SHA256 = subprocess.Popen([os.path.join(os.path.dirname(os.path.realpath(__file__)), "bin/sha256sum.exe"), deb], stdout=subprocess.PIPE).communicate()[0]
 			SHA256 = SHA256.split(" ", 1)[0]
 
-			if (SHA256[:1] == "\\"):
+			if SHA256[:1] == "\\":
 				SHA256 = SHA256[1:]
 
 			SHA256 = "SHA256: {0}\n".format(SHA256)
@@ -49,7 +52,7 @@ class scanpkg:
 			Size = "Size: {0}".format(os.path.getsize(deb))
 
 			self.STRING = "{0}{1}{2}{3}{4}{5}\n\n".format(control, MD5sum, SHA1, SHA256, Filename, Size)
-			
+
 	@click.command()
 	@click.option('-v', default=0, help='Verbose scanpkg')
 	@click.option('-dir', help='Directory to scan', required=True)
@@ -78,13 +81,12 @@ class scanpkg:
 					TEMP_PACKAGE_DIR = os.path.join(TEMP_DIR, os.path.splitext(os.path.join(root, file))[0])
 					TEMP_PACKAGE_CONTROL_TAR = os.path.join(TEMP_PACKAGE_DIR, "control.tar.gz")
 					TEMP_PACKAGE_CONTROL_FILE = os.path.join(TEMP_PACKAGE_DIR, "control")
-					TEMP_PACKAGE_DATA_TAR = os.path.join(TEMP_PACKAGE_DIR, "data.tar.gz")
+
 					if not os.path.isdir(TEMP_PACKAGE_DIR):
 						os.makedirs(TEMP_PACKAGE_DIR)
 
-
 					if v:
-						print "Extracted {0}".format(os.path.basename(TEMP_PACKAGE))
+						print("Extracted {0}".format(os.path.basename(TEMP_PACKAGE)))
 
 					shutil.copyfile(TEMP_PACKAGE, os.path.join(TEMP_PACKAGE_DIR, file))
 					TEMP_PACKAGE = os.path.join(TEMP_PACKAGE_DIR, file)
@@ -104,18 +106,18 @@ class scanpkg:
 
 						PACKAGE_STRING += CONTROL_MODIFIED
 
-						print "Added file {0}".format(os.path.basename(TEMP_PACKAGE))
+						print("Added file {0}".format(os.path.basename(TEMP_PACKAGE)))
 
 		shutil.rmtree(TEMP_DIR, ignore_errors=True)
 		with open("./Packages", "w+") as f:
 			f.write(PACKAGE_STRING)
 
-		subprocess.call(["gzip", "./Packages"])
-
+		subprocess.call([os.path.join(os.path.dirname(os.path.realpath(__file__)), "bin/gzip.exe"), "./Packages"])
 
 
 def main():
 	scanpkg().scandebs()
+
 
 if __name__ == "__main__":
 	main()
