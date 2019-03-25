@@ -20,6 +20,7 @@ import click, os, shutil, patoolib, sys, subprocess
 
 TEMP_DIR = ".scanpkgtmp"
 
+
 class scanpkg:
     class control:
         STRING = ""
@@ -53,6 +54,7 @@ class scanpkg:
             Size = "Size: {0}".format(os.path.getsize(deb))
 
             self.STRING = "{0}{1}{2}{3}{4}{5}\n\n".format(control, MD5sum, SHA1, SHA256, Filename, Size)\
+
 
     @click.command()
     @click.option('-v', default=0, help='Verbose scanpkg')
